@@ -1,53 +1,46 @@
-import json
-from pathlib import Path
+import pandas as pd
+import streamlit as st
 from pypdf import PdfReader
 
-def extract_form_fields_batch(input_folder: str, output_json: str):
-    all_form_data = {}
-    pdf_dir = Path(input_folder)
+st.title("PDF Form to Excel Converter")
+st.write("Upload your PDFs, and we will extract the data into an Excel sheet!")
 
-    # Efficiently stream through the folder file-by-file
-    for pdf_path in pdf_dir.glob("*.[pP][dD][fF]"):
-        file_name = pdf_path.name
+# 1. Create a file uploader on the webpage
+uploaded_files = st.file_uploader(
+    "Choose PDF files", type="pdf", accept_multiple_files=True
+)
 
-        try:
-            reader = PdfReader(pdf_path)
+if uploaded_files:
+    all_data = []
 
-            # Fast check: Skip the file entirely if it has no interactive form fields
-            fields = reader.get_fields()
-            if not fields:
-                continue
+    # 2. Process the uploaded files
+    for uploaded_file in uploaded_files:
+        reader = PdfReader(uploaded_file)
+        fields = reader.get_fields()
 
-            file_data = {}
-            # Your exact snippet, optimized to store data instead of just printing it
+        if fields:
+            file_data = {"File Name": uploaded_file.name}
             for field_name, field_data in fields.items():
-                # Extract the value, default to an empty string if blank
-                value = field_data.get("/V", "")
+                file_data[field_name] = field_data.get("/V", "")
+            all_data.append(file_data)
 
-                # Clean up PDF formatting quirks (e.g., checkbox '/Yes' becomes 'Yes')
-                if isinstance(value, str) and value.startswith("/"):
-                    value = value.lstrip("/")
+    # 3. Show a preview table on the website
+    if all_data:
+        df = pd.DataFrame(all_data)
+        st.subheader("Data Preview")
+        st.dataframe(df)
 
-                file_data[field_name] = value
+        # 4. Create an Excel download button
+        # (We save to system memory instead of a file path so web users can download it)
+        import io
 
-            all_form_data[file_name] = file_data
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False)
 
-        except Exception as e:
-            print(f"Error skipping/reading {file_name}: {e}")
-
-    # Write all collected data to a JSON file at once
-    with open(output_json, "w", encoding="utf-8") as f:
-        json.dump(all_form_data, f, indent=4, ensure_ascii=False)
-
-extract_form_fields_batch("/content/BackgroundCheckTest", "extracted_forms.json")
-
-import pandas as pd
-
-with open("extracted_forms.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-df = pd.DataFrame.from_dict(data, orient="index")
-headers = ["Personal_name_first~7", "Personal_name_last~7", "EF_Emp_phone_primary~7", "EF_Emp_birth_date~7", "EF_Emp_Residence_street_1~7", "EF_Emp_Residence_city~7", "EF_Emp_Residence_state_rdo~7", "EF_Emp_Residence_zip_code~7", "EF_Emp_ssn~7", "EF_Emp_email~7"]
-df = df.reindex(columns = headers)
-df.columns = ["First name", "Last name", "Phone", "DOB", "Address Street", "Address City", "Address State", "Address Zip", "SSN", "Email Address"]
-
-df.to_excel("test.xlsx")
+        st.download_button(
+            label="📥 Download Excel Sheet",
+            data=buffer.getvalue(),
+            file_name="extracted_pdf_data.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
