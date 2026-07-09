@@ -1,3 +1,4 @@
+pip install pypdf 
 import pandas as pd
 import streamlit as st
 from pypdf import PdfReader
