@@ -232,7 +232,11 @@ if submit_button:
                     value = field_info.get("/V", "")
                     if isinstance(value, str) and value.startswith("/"):
                         value = value.lstrip("/")
-                    file_data[field_name] = value
+                    
+                    # --- FIX 1: TRANSLATE KEY TO STANDARD NAME ---
+                    # If the key exists in FIELD_MAP, use the clean name. Otherwise, keep original.
+                    clean_header = FIELD_MAP.get(field_name, field_name)
+                    file_data[clean_header] = value
                     
                 all_form_data[uploaded_file.name] = file_data
                 
@@ -243,21 +247,34 @@ if submit_button:
 
         if all_form_data:
             df = pd.DataFrame.from_dict(all_form_data, orient="index")
-            headers = [
-                "Personal_name_first~7", "Personal_name_last~7", "EF_Emp_phone_primary~7", 
-                "EF_Emp_birth_date~7", "EF_Emp_Residence_street_1~7", "EF_Emp_Residence_city~7", 
-                "EF_Emp_Residence_state_rdo~7", "EF_Emp_Residence_zip_code~7", "EF_Emp_ssn~7", "EF_Emp_email~7"
+            
+            # --- FIX 2: REINDEX USING THE CLEAN HEADERS ---
+            # Now we can target the final, polished column names we want in our Excel sheet
+            desired_columns = [
+                "First Name", 
+                "Last Name", 
+                "Primary Phone", 
+                "Date of Birth", 
+                "Street Address 1", 
+                "City", 
+                "State", 
+                "Zip Code", 
+                "SSN", 
+                "Email Address"
             ]
-            df = df.reindex(columns=headers)
-            df.columns = ["First name", "Last name", "Phone", "DOB", "Address Street", "Address City", "Address State", "Address Zip", "SSN", "Email Address"]
             
-            st.success(f"🎉 Successfully processed {len(all_form_data)} PDFs!")
+            # Safely reindex (keeps columns in this exact order, leaving them blank if a PDF has none of them)
+            df = df.reindex(columns=desired_columns)
             
-            # --- NEW: VISUAL PREVIEW SECTION ---
-            st.subheader("📊 Spreadsheet Preview")
+            # Set the index name to be descriptive in Excel
+            df.index.name = "Source File Name"
+            
+            st.success(f"Successfully processed {len(all_form_data)} PDFs!")
+            
+            # --- VISUAL PREVIEW SECTION ---
+            st.subheader("Spreadsheet Preview")
             st.write("Review the extracted data below before downloading:")
             
-            # Turns the preview into a grid you can highlight, copy, and select text from
             st.data_editor(df, use_container_width=True, key="excel_preview", disabled=True)
             
             # Prepare the Excel file in the background
@@ -265,14 +282,13 @@ if submit_button:
             with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
                 df.to_excel(writer, index=True, sheet_name='Extracted Data')
             
-            # Add some spacing and the download button right beneath the preview
             st.markdown("---")
             st.download_button(
-                label="📥 Download Excel File",
+                label="Download Excel File",
                 data=buffer.getvalue(),
                 file_name="background_checks_output.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                type="primary" # Makes the button stand out in a bright color
+                type="primary"
             )
         else:
             st.warning("No interactive form fields were found in the uploaded PDFs.")
