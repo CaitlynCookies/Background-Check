@@ -3,9 +3,55 @@ import json
 import pandas as pd
 from pypdf import PdfReader
 import io
+import re
 
-# Clean Base Map (no tildes needed!). 
-# The script will automatically strip suffixes like ~3, ~5, ~9 etc.
+# ==========================================
+# 1. VISUAL LAYER SCRAPER HELPER FUNCTION
+# ==========================================
+def extract_visual_fallbacks(reader):
+    """
+    Scrapes the visual text layer of the PDF as a fallback 
+    for flattened, unreadable fields (DOB, Phone, Email).
+    """
+    fallback_data = {}
+    
+    # Combine the raw text from all pages
+    full_text = ""
+    for page in reader.pages:
+        text = page.extract_text()
+        if text:
+            full_text += "\n" + text
+            
+    # Regex search for Email (looks for standard name@domain.com)
+    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', full_text)
+    if email_match:
+        fallback_data["Email Address"] = email_match.group(0)
+        
+    # Regex search for Phone Number (captures formats like: (123) 456-7890, 123-456-7890, 123.456.7890)
+    phone_match = re.search(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', full_text)
+    if phone_match:
+        fallback_data["Phone"] = phone_match.group(0)
+        
+    # Regex search for DOB (Date of Birth)
+    dob_label_match = re.search(
+        r'(?:dob|date of birth|birth date|birthdate)[\s:]*(\d{1,2}[-/\s]\d{1,2}[-/\s]\d{2,4})', 
+        full_text, 
+        re.IGNORECASE
+    )
+    if dob_label_match:
+        fallback_data["DOB"] = dob_label_match.group(1)
+    else:
+        # Generic date search fallback (MM/DD/YYYY or YYYY-MM-DD)
+        date_match = re.search(r'\b(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})\b', full_text)
+        if date_match:
+            fallback_data["DOB"] = date_match.group(1)
+            
+    return fallback_data
+
+
+# ==========================================
+# 2. FIELD MAPPING & FINAL COLUMNS
+# ==========================================
 BASE_FIELD_MAP = {
     # --- FIRST NAME ---
     "First name": "First name",
@@ -20,7 +66,7 @@ BASE_FIELD_MAP = {
     # --- PHONE ---
     "Phone": "Phone",
     "EF_Emp_phone_primary": "Phone",
-    "EF_Emp_phone_secondary": "Phone",  # Merges secondary phone if primary is missing
+    "EF_Emp_phone_secondary": "Phone",
     
     # --- DOB ---
     "DOB": "DOB",
@@ -57,7 +103,6 @@ BASE_FIELD_MAP = {
     "EF_Emp_email": "Email Address",
 }
 
-# The strictly filtered columns displayed in Streamlit & written to Excel
 FINAL_COLUMNS = [
     "First name", 
     "Last name", 
@@ -71,6 +116,9 @@ FINAL_COLUMNS = [
     "Email Address"
 ]
 
+# ==========================================
+# 3. STREAMLIT UI SETUP
+# ==========================================
 st.set_page_config(page_title="PDF to Excel Converter", page_icon="📝", layout="centered")
 
 st.title("📝 PDF Background Check Extractor")
@@ -84,6 +132,9 @@ with st.form(key="pdf_upload_form", clear_on_submit=False):
     )
     submit_button = st.form_submit_button(label="⚡ Convert to Excel")
 
+# ==========================================
+# 4. PROCESSING ENGINE
+# ==========================================
 if submit_button:
     if not uploaded_files:
         st.error("Please upload at least one PDF file before clicking convert.")
@@ -96,42 +147,33 @@ if submit_button:
                 reader = PdfReader(uploaded_file)
                 file_data = {}
                 
-                # Extract fields using standard get_fields()
+                # Standard Form Extraction
                 fields = reader.get_fields() or {}
-                
-                # Fallback: get form text fields (handles browser-filled PDFs better)
                 text_fields = reader.get_form_text_fields() or {}
-                
                 combined_fields = {}
                 
-                # 1. Process standard fields
+                # Process fields
                 for field_name, field_info in fields.items():
                     val = field_info.get("/V", "")
-                    # If standard value is empty, try to check the widget's default state
                     if not val and "/DV" in field_info:
                         val = field_info.get("/DV", "")
                     combined_fields[field_name] = val
                 
-                # 2. Merge with fallback text fields
                 for field_name, val in text_fields.items():
                     if val and not combined_fields.get(field_name):
                         combined_fields[field_name] = val
 
-                # 3. Clean and map using Base-Name matching
+                # Clean & Map Fields to Base Names
                 for field_name, value in combined_fields.items():
                     if isinstance(value, str):
                         value = value.strip()
                         if value.startswith("/"):
                             value = value.lstrip("/")
                     
-                    # Dynamically strip tilde suffixes (e.g., "EF_Emp_birth_date~5" -> "EF_Emp_birth_date")
                     base_field_name = field_name.split('~')[0] if '~' in field_name else field_name
-                    
-                    # Determine target excel column name
                     clean_column_name = BASE_FIELD_MAP.get(base_field_name, field_name)
                     
                     if value:
-                        # Overwrite protection: keep longest value
                         if clean_column_name in file_data and file_data[clean_column_name]:
                             if len(str(value)) > len(str(file_data[clean_column_name])):
                                 file_data[clean_column_name] = value
@@ -141,6 +183,23 @@ if submit_button:
                         if clean_column_name not in file_data:
                             file_data[clean_column_name] = ""
                             
+                # ==========================================
+                # 5. THE FALLBACK TRIGGER (PLACED HERE)
+                # ==========================================
+                # Standard mapping finished. Now, are crucial fields still blank?
+                missing_crucial_fields = [
+                    f for f in ["DOB", "Phone", "Email Address"] 
+                    if not file_data.get(f) or file_data.get(f) == ""
+                ]
+                
+                # If they are, parse the visual text layer of the PDF using regex
+                if missing_crucial_fields:
+                    fallback_values = extract_visual_fallbacks(reader)
+                    
+                    for field in missing_crucial_fields:
+                        if field in fallback_values and fallback_values[field]:
+                            file_data[field] = fallback_values[field]
+                            
                 all_form_data[uploaded_file.name] = file_data
                 
             except Exception as e:
@@ -148,36 +207,32 @@ if submit_button:
             
             progress_bar.progress((index + 1) / len(uploaded_files))
 
+        # ==========================================
+        # 6. OUTPUT GENERATION & DOWNLOADING
+        # ==========================================
         if all_form_data:
-            # === AUTO-SAVE ALL EXTRACTED RAW FIELDS TO CLOUD DISK ===
             try:
                 with open("extracted_data.json", "w", encoding="utf-8") as f:
                     json.dump(all_form_data, f, indent=4)
             except Exception:
                 pass
 
-            # Create DataFrame
             df = pd.DataFrame.from_dict(all_form_data, orient="index")
-            
-            # Reindex to strictly keep ONLY the 10 target fields
             df = df.reindex(columns=FINAL_COLUMNS)
             df.index.name = "Source File Name"
             df = df.fillna("")
             
             st.success(f"🎉 Successfully processed {len(all_form_data)} PDFs!")
             
-            # --- VISUAL PREVIEW SECTION ---
             st.subheader("📊 Spreadsheet Preview")
             st.data_editor(df, use_container_width=True, key="excel_preview", disabled=True)
             
-            # Save Excel workbook file to memory buffer
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
                 df.to_excel(writer, index=True, sheet_name='Extracted Data')
             
             st.markdown("---")
             
-            # UI Downloads Columns
             col1, col2 = st.columns(2)
             with col1:
                 st.download_button(
@@ -188,7 +243,6 @@ if submit_button:
                     type="primary"
                 )
             with col2:
-                # Delivers the ENTIRE parsed PDF database
                 st.download_button(
                     label="📥 Download Raw JSON File (Entire PDF Data)",
                     data=json.dumps(all_form_data, indent=4),
