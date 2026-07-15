@@ -187,18 +187,17 @@ if submit_button:
                 # 5. THE FALLBACK TRIGGER (PLACED HERE)
                 # ==========================================
                 # Standard mapping finished. Now, are crucial fields still blank?
-                missing_crucial_fields = [
-                    f for f in ["DOB", "Phone", "Email Address"] 
-                    if not file_data.get(f) or file_data.get(f) == ""
-                ]
+                visual_values = extract_visual_fallbacks(reader)
                 
-                # If they are, parse the visual text layer of the PDF using regex
-                if missing_crucial_fields:
-                    fallback_values = extract_visual_fallbacks(reader)
+                # Forcefully overwrite these three fields with the visually displayed text
+                if "DOB" in visual_values:
+                    file_data["DOB"] = visual_values["DOB"]
                     
-                    for field in missing_crucial_fields:
-                        if field in fallback_values and fallback_values[field]:
-                            file_data[field] = fallback_values[field]
+                if "Phone" in visual_values:
+                    file_data["Phone"] = visual_values["Phone"]
+                    
+                if "Email Address" in visual_values:
+                    file_data["Email Address"] = visual_values["Email Address"]
                             
                 all_form_data[uploaded_file.name] = file_data
                 
