@@ -7,40 +7,37 @@ import re
 import difflib
 import logging
 
+# Silence the harmless Streamlit thread context warning in your console
+logging.getLogger("streamlit.runtime.scriptrunner_utils").setLevel(logging.ERROR)
 
 # 1. Simplified Field Map (No ~7, ~8, ~10 page suffixes needed anymore!)
+# These map normalized raw PDF keys directly to your exact Excel column headers.
 FIELD_MAP = {
     # === PERSONAL INFORMATION ===
-    "personal_name_first": "First Name",
-    "ef_emp_name_first": "First Name",
-    "personal_name_last": "Last Name",
-    "ef_emp_name_last": "Last Name",
-    "personaltransforms_name_middle_initial_vb": "Middle Initial",
-    "personaltran_name_middle_init": "Middle Initial",
-    "ef_emp_name_middle": "Middle Initial",
-    "personaltransforms_name_full_vc": "Full Name",
-    "ef_emp_name_full": "Full Name",
-    "personaltran_name__full_f_s_m_s_l_vc": "Full Name",
+    "personal_name_first": "First name",
+    "ef_emp_name_first": "First name",
+    "personal_name_last": "Last name",
+    "ef_emp_name_last": "Last name",
     "personal_ssn": "SSN",
     "ef_emp_ssn": "SSN",
     
-    # --- CRITICAL FIX: DATE OF BIRTH VARIANTS ---
-    "ef_emp_birth_date": "Date of Birth",
-    "personal_birth_date": "Date of Birth",
-    "dob": "Date of Birth",
-    "birth_date": "Date of Birth",
-    "employee_dob": "Date of Birth",
+    # --- DATE OF BIRTH VARIANTS ---
+    "ef_emp_birth_date": "DOB",
+    "personal_birth_date": "DOB",
+    "dob": "DOB",
+    "birth_date": "DOB",
+    "employee_dob": "DOB",
     
-    # --- CRITICAL FIX: PRIMARY PHONE VARIANTS ---
-    "ef_emp_phone_primary": "Primary Phone",
-    "personal_phone_primary": "Primary Phone",
-    "phone_primary": "Primary Phone",
-    "phone": "Primary Phone",
-    "cell_phone": "Primary Phone",
-    "telephone": "Primary Phone",
-    "employee_phone": "Primary Phone",
+    # --- PRIMARY PHONE VARIANTS ---
+    "ef_emp_phone_primary": "Phone",
+    "personal_phone_primary": "Phone",
+    "phone_primary": "Phone",
+    "phone": "Phone",
+    "cell_phone": "Phone",
+    "telephone": "Phone",
+    "employee_phone": "Phone",
     
-    # --- CRITICAL FIX: EMAIL VARIANTS ---
+    # --- EMAIL VARIANTS ---
     "ef_emp_email": "Email Address",
     "personal_email": "Email Address",
     "email": "Email Address",
@@ -48,29 +45,29 @@ FIELD_MAP = {
     "employee_email": "Email Address",
     
     # === CONTACT & ADDRESS ===
-    "resaddrtran_addr__street_full_vc": "Street Address",
-    "resaddr_addr__street_1": "Street Address 1",
-    "ef_emp_residence_street_1": "Street Address 1",
-    "resaddr_addr__street_2": "Street Address 2",
-    "ef_emp_residence_street_2": "Street Address 2",
-    "resaddr_addr__city": "City",
-    "ef_emp_residence_city": "City",
-    "resaddr_addr__state_desc": "State",
-    "ef_emp_residence_state_rdo": "State",
-    "resaddr_addr__zip_code": "Zip Code",
-    "ef_emp_residence_zip_code": "Zip Code",
+    "resaddrtran_addr__street_full_vc": "Address Street",
+    "resaddr_addr__street_1": "Address Street",
+    "ef_emp_residence_street_1": "Address Street",
+    "resaddr_addr__street_2": "Address Street 2", # Track optional street 2 separately
+    "ef_emp_residence_street_2": "Address Street 2",
+    "resaddr_addr__city": "Address City",
+    "ef_emp_residence_city": "Address City",
+    "resaddr_addr__state_desc": "Address State",
+    "ef_emp_residence_state_rdo": "Address State",
+    "resaddr_addr__zip_code": "Address Zip",
+    "ef_emp_residence_zip_code": "Address Zip",
 }
 
-# Define the final columns we want in our Excel sheet (in order)
+# The precise column layout and order you want in your finalized Excel file
 DESIRED_COLUMNS = [
-    "First Name", 
-    "Last Name", 
-    "Primary Phone", 
-    "Date of Birth", 
-    "Street Address 1", 
-    "City", 
-    "State", 
-    "Zip Code", 
+    "First name", 
+    "Last name", 
+    "Phone", 
+    "DOB", 
+    "Address Street", 
+    "Address City", 
+    "Address State", 
+    "Address Zip", 
     "SSN", 
     "Email Address"
 ]
@@ -90,7 +87,7 @@ def universal_standardize(raw_key: str) -> str:
     if normalized_key in FIELD_MAP:
         return FIELD_MAP[normalized_key]
         
-    # Step 4: Fuzzy Matching Fallback (85% match or closer)
+    # Step 4: Fuzzy Matching Fallback (85% match or closer) to catch minor typos automatically
     close_matches = difflib.get_close_matches(normalized_key, FIELD_MAP.keys(), n=1, cutoff=0.85)
     if close_matches:
         matched_key = close_matches[0]
@@ -103,7 +100,7 @@ def universal_standardize(raw_key: str) -> str:
 st.set_page_config(page_title="PDF to Excel Converter", page_icon="📝", layout="centered")
 
 st.title("📝 PDF Background Check Extractor")
-st.write("Upload your PDF forms below. The system will automatically align varying field names from different versions!")
+st.write("Upload your PDF forms below. The system automatically unifies differently labeled fields across form versions!")
 
 with st.form(key="pdf_upload_form", clear_on_submit=False):
     uploaded_files = st.file_uploader(
@@ -131,18 +128,28 @@ if submit_button:
                 file_data = {}
                 for field_name, field_info in fields.items():
                     value = field_info.get("/V", "")
-                    if isinstance(value, str) and value.startswith("/"):
-                        value = value.lstrip("/")
+                    if isinstance(value, str):
+                        value = value.strip()
+                        if value.startswith("/"):
+                            value = value.lstrip("/")
                     
                     # Run Universal Standardizer
                     clean_header = universal_standardize(field_name)
                     
-                    # Combine overlapping/duplicate field values intelligently
-                    if clean_header in file_data and file_data[clean_header]:
-                        if len(str(value)) > len(str(file_data[clean_header])):
+                    # --- CRITICAL OVERWRITE SAFEGUARD ---
+                    # Only map or alter a value if the extracted string is non-empty.
+                    # This prevents empty trailing forms in a packet from deleting valid phone/email/DOB fields.
+                    if value:
+                        if clean_header in file_data and file_data[clean_header]:
+                            # If a value already exists, keep the longer, more complete value
+                            if len(str(value)) > len(str(file_data[clean_header])):
+                                file_data[clean_header] = value
+                        else:
                             file_data[clean_header] = value
                     else:
-                        file_data[clean_header] = value
+                        # If incoming field is blank, only initialize it if the column isn't already populated
+                        if clean_header not in file_data:
+                            file_data[clean_header] = ""
                     
                 all_form_data[uploaded_file.name] = file_data
                 
@@ -154,29 +161,31 @@ if submit_button:
         if all_form_data:
             df = pd.DataFrame.from_dict(all_form_data, orient="index")
             
-            # Safety check: If the dataframe is completely empty, stop processing safely
+            # Safety check: If the dataframe is completely empty, stop execution cleanly
             if df.empty:
-                st.warning("Processed files, but no matching columns could be built.")
+                st.warning("Processed files, but no matching fields could be built.")
                 st.stop()
 
-            # Reindex to keep only our beautifully organized target columns
+            # Safely conform columns to your target headers in exact order (creates empty columns if missing)
             df = df.reindex(columns=DESIRED_COLUMNS)
             df.index.name = "Source File Name"
             
-            # Clean up missing data visually in Streamlit (replaces NaN with blanks)
+            # Clean up NaN representations to blanks for clear reading
             df = df.fillna("")
             
             st.success(f"🎉 Successfully processed {len(all_form_data)} PDFs!")
             
+            # --- VISUAL PREVIEW SECTION ---
             st.subheader("📊 Spreadsheet Preview")
+            st.write("Review the extracted data below before downloading:")
             st.data_editor(df, use_container_width=True, key="excel_preview", disabled=True)
             
-            # Write to a memory buffer for the browser to download
+            # Save final data into a clean memory buffer for browser-side download
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
                 df.to_excel(writer, index=True, sheet_name='Extracted Data')
             
-            # Explicitly delete objects to free system memory and prevent dropped connections
+            # Memory safety: clean up internal data frames to keep app connections stable
             del df
             del all_form_data
 
