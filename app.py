@@ -91,15 +91,15 @@ def universal_standardize(raw_key: str) -> str:
     # Step 2: Normalize (lowercase, strip whitespace)
     normalized_key = clean_key.strip().lower()
     
-    # Step 3: Direct lookup in our simplified FIELD_MAP
-    if normalized_key in FIELD_MAP:
-        return FIELD_MAP[normalized_key]
+    # Step 3: Direct lookup in our simplified KEY_TRANSLATION_MAP
+    if normalized_key in KEY_TRANSLATION_MAP:
+        return KEY_TRANSLATION_MAP[normalized_key]
         
     # Step 4: Fuzzy Matching Fallback (85% match or closer) to catch minor typos automatically
-    close_matches = difflib.get_close_matches(normalized_key, FIELD_MAP.keys(), n=1, cutoff=0.85)
+    close_matches = difflib.get_close_matches(normalized_key, KEY_TRANSLATION_MAP.keys(), n=1, cutoff=0.85)
     if close_matches:
         matched_key = close_matches[0]
-        return FIELD_MAP[matched_key]
+        return KEY_TRANSLATION_MAP[matched_key]
         
     # Step 5: If no match found, keep the stripped name as a fallback
     return clean_key
