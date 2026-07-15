@@ -10,52 +10,60 @@ import logging
 # Silence the harmless Streamlit thread context warning in your console
 logging.getLogger("streamlit.runtime.scriptrunner_utils").setLevel(logging.ERROR)
 
-# 1. Simplified Field Map (No ~7, ~8, ~10 page suffixes needed anymore!)
-# These map normalized raw PDF keys directly to your exact Excel column headers.
-FIELD_MAP = {
-    # === PERSONAL INFORMATION ===
-    "personal_name_first": "First name",
-    "ef_emp_name_first": "First name",
-    "personal_name_last": "Last name",
-    "ef_emp_name_last": "Last name",
-    "personal_ssn": "SSN",
-    "ef_emp_ssn": "SSN",
+KEY_TRANSLATION_MAP = {
+    # First Name
+    "Personal_name_first~7": "First name",
+    "Personal_name_first~8": "First name",
+    "Personal_name_first~9": "First name",
+    "EF_Emp_name_first~4": "First name",
     
-    # --- DATE OF BIRTH VARIANTS ---
-    "ef_emp_birth_date": "DOB",
-    "personal_birth_date": "DOB",
-    "dob": "DOB",
-    "birth_date": "DOB",
-    "employee_dob": "DOB",
+    # Last Name
+    "Personal_name_last~7": "Last name",
+    "Personal_name_last~8": "Last name",
+    "Personal_name_last~9": "Last name",
+    "EF_Emp_name_last~4": "Last name",
     
-    # --- PRIMARY PHONE VARIANTS ---
-    "ef_emp_phone_primary": "Phone",
-    "personal_phone_primary": "Phone",
-    "phone_primary": "Phone",
-    "phone": "Phone",
-    "cell_phone": "Phone",
-    "telephone": "Phone",
-    "employee_phone": "Phone",
+    # Phone (Fixes the page ~3 and ~4 issue!)
+    "EF_Emp_phone_primary~3": "Phone",
+    "EF_Emp_phone_primary~4": "Phone",
     
-    # --- EMAIL VARIANTS ---
-    "ef_emp_email": "Email Address",
-    "personal_email": "Email Address",
-    "email": "Email Address",
-    "email_address": "Email Address",
-    "employee_email": "Email Address",
+    # DOB (Fixes the page ~4 issue!)
+    "EF_Emp_birth_date~4": "DOB",
     
-    # === CONTACT & ADDRESS ===
-    "resaddrtran_addr__street_full_vc": "Address Street",
-    "resaddr_addr__street_1": "Address Street",
-    "ef_emp_residence_street_1": "Address Street",
-    "resaddr_addr__street_2": "Address Street 2", # Track optional street 2 separately
-    "ef_emp_residence_street_2": "Address Street 2",
-    "resaddr_addr__city": "Address City",
-    "ef_emp_residence_city": "Address City",
-    "resaddr_addr__state_desc": "Address State",
-    "ef_emp_residence_state_rdo": "Address State",
-    "resaddr_addr__zip_code": "Address Zip",
-    "ef_emp_residence_zip_code": "Address Zip",
+    # Street Address
+    "ResAddrTran_addr__street_full_VC~7": "Address Street",
+    "ResAddr_addr__street_1~8": "Address Street",
+    "ResAddr_addr__street_1~9": "Address Street",
+    "EF_Emp_Residence_street_1~3": "Address Street",
+    "EF_Emp_Residence_street_1~4": "Address Street",
+    
+    # City
+    "ResAddrTran_addr__city_cs_state_s_zip_VC~7": "Address City",
+    "ResAddr_addr__city~8": "Address City",
+    "ResAddr_addr__city~9": "Address City",
+    "EF_Emp_Residence_city~3": "Address City",
+    "EF_Emp_Residence_city~4": "Address City",
+    
+    # State
+    "ResAddr_addr__state_desc~8": "Address State",
+    "ResAddr_addr__state_desc~9": "Address State",
+    "EF_Emp_Residence_state_rdo~3": "Address State",
+    "EF_Emp_Residence_state_rdo~4": "Address State",
+    
+    # Zip Code
+    "ResAddr_addr__zip_code~8": "Address Zip",
+    "ResAddr_addr__zip_code~9": "Address Zip",
+    "EF_Emp_Residence_zip_code~3": "Address Zip",
+    "EF_Emp_Residence_zip_code~4": "Address Zip",
+    
+    # SSN
+    "Personal_ssn~7": "SSN",
+    "Personal_ssn~8": "SSN",
+    "Personal_ssn~9": "SSN",
+    "EF_Emp_ssn~4": "SSN",
+    
+    # Email (Fixes the page ~4 issue!)
+    "EF_Emp_email~4": "Email Address"
 }
 
 # The precise column layout and order you want in your finalized Excel file
