@@ -6,94 +6,168 @@ import io
 
 FIELD_MAP = {
     # === PERSONAL INFORMATION ===
-    "Personal_name_first~7": "First name",
-    "Personal_name_first~8": "First name",
-    "Personal_name_first~9": "First name",
-    "EF_Emp_name_first~4": "First name",
-    "Personal_name_last~7": "Last name",
-    "Personal_name_last~8": "Last name",
-    "Personal_name_last~9": "Last name",
-    "EF_Emp_name_last~4": "Last name",
-    "PersonalTransforms_name_middle_initial_VB~7": "Middle Initial",
-    "PersonalTran_name_middle_init~8": "Middle Initial",
-    "PersonalTran_name_middle_init~9": "Middle Initial",
-    "EF_Emp_name_middle~4": "Middle Initial",
-    "PersonalTransforms_name_full_VC~4": "Full Name",
-    "EF_Emp_name_full~3": "Full Name",
-    "EF_Emp_name_full~4": "Full Name",
-    "PersonalTran_name__full_f_s_m_s_l_vc~10": "Full Name",
-    "Personal_ssn~7": "SSN",
-    "Personal_ssn~8": "SSN",
-    "Personal_ssn~9": "SSN",
-    "EF_Emp_ssn~4": "SSN",
-    
-    # --- DATE OF BIRTH ---
-    "EF_Emp_birth_date~4": "DOB",
-    "EF_Emp_birth_date~7": "DOB",
-    
-    "Personal_primary_language_english_yn~10": "Primary Language English (Y/N)",
-    "Personal_primary_language_other_txt~10": "Primary Language Other",
-    "Ethnicity_disabled_yn~4": "Ethnicity Disabled (Y/N)",
-    
+    "First name": "First name",
+    "Last name": "Last name",
+    "Middle Initial": "Middle Initial",
+    "Full Name": "Full Name",
+    "SSN": "SSN",
+    "DOB": "DOB",
+    "Phone": "Phone",
+    "Email Address": "Email Address",
+    "Primary Language English (Y/N)": "Primary Language English (Y/N)",
+    "Primary Language Other": "Primary Language Other",
+    "Ethnicity Disabled (Y/N)": "Ethnicity Disabled (Y/N)",
+
     # === CONTACT & ADDRESS ===
-    "ResAddrTran_addr__street_full_VC~7": "Address Street",
-    "ResAddr_addr__street_1~8": "Address Street",
-    "ResAddr_addr__street_1~9": "Address Street",
-    "EF_Emp_Residence_street_1~3": "Address Street",
-    "EF_Emp_Residence_street_1~4": "Address Street",
-    "ResAddr_addr__street_2~8": "Address Street 2",
-    "ResAddr_addr__street_2~9": "Address Street 2",
-    "EF_Emp_Residence_street_2~3": "Address Street 2",
-    "ResAddrTran_addr__city_cs_state_s_zip_VC~7": "City State Zip",
-    "ResAddr_addr__city~8": "Address City",
-    "ResAddr_addr__city~9": "Address City",
-    "EF_Emp_Residence_city~3": "Address City",
-    "EF_Emp_Residence_city~4": "Address City",
-    "ResAddr_addr__state_desc~8": "Address State",
-    "ResAddr_addr__state_desc~9": "Address State",
-    "EF_Emp_Residence_state_rdo~3": "Address State",
-    "EF_Emp_Residence_state_rdo~4": "Address State",
-    "ResAddr_addr__zip_code~8": "Address Zip",
-    "ResAddr_addr__zip_code~9": "Address Zip",
-    "EF_Emp_Residence_zip_code~3": "Address Zip",
-    "EF_Emp_Residence_zip_code~4": "Address Zip",
-    
-    # --- PHONE ---
-    "EF_Emp_phone_primary~3": "Phone",
-    "EF_Emp_phone_primary~4": "Phone",
-    "EF_Emp_phone_primary~7": "Phone",
-    
-    # --- EMAIL ---
-    "EF_Emp_email~4": "Email Address",
-    "EF_Emp_email~7": "Email Address",
+    "Address Street": "Address Street",
+    "Address Street 2": "Address Street 2",
+    "Address City": "Address City",
+    "Address State": "Address State",
+    "Address Zip": "Address Zip",
+    "City State Zip": "City State Zip",
 
     # === EMPLOYMENT & HR DETAILS ===
-    "EmployeeID~4": "Employee ID",
-    "AS_z_wfuel_oracle_id~8": "Oracle ID",
-    "AS_z_wfuel_oracle_id_2~8": "Oracle ID 2",
-    "HR_Job_Title~4": "Job Title",
-    "HR_date_of_hire~4": "Date of Hire",
-    "HR_Profile_date_start~7": "Start Date",
-    "HR_date_start~8": "Start Date",
-    "EF_Emp_start_date~4": "Start Date",
-    "EF_Emp_pay_rate~4": "Pay Rate",
-    "EF_Emp_hours_per_week~4": "Hours Per Week",
-    "The_Date~4": "Form Date",
+    "Employee ID": "Employee ID",
+    "Oracle ID": "Oracle ID",
+    "Oracle ID 2": "Oracle ID 2",
+    "Job Title": "Job Title",
+    "Date of Hire": "Date of Hire",
+    "Start Date": "Start Date",
+    "Pay Rate": "Pay Rate",
+    "Hours Per Week": "Hours Per Week",
+    "Form Date": "Form Date",
 
     # === FEDERAL W-4 WITHHOLDINGS ===
-    "W4_marital_status_W4_rdo~7": "Federal Marital Status",
-    "W4_two_job_method_rdo~7": "Federal Two Jobs Option (Y/N)",
-    "Employee_W4_extra_withhold_amount~7": "W4 Extra Withholding Amount",
-    "Employee_W4_deductions_amount~7": "W4 Deductions Amount",
-    "Employee_W4_other_income_amount~7": "W4 Other Income Amount",
-    "Employee_W4_qualifying_deps_amount~7": "W4 Qualifying Dependents Amount",
-    "Employee_W4_other_deps_amount~7": "W4 Other Dependents Amount",
-    "Employee_W4_total_deps_amount~7": "W4 Total Dependents Amount",
-    "Employee_W4_Exempt_txt~7": "W4 Exempt Status Text",
-    "Employee_W4_NRA_txt~7": "W4 Non-Resident Alien Text",
+    "Federal Marital Status": "Federal Marital Status",
+    "Federal Two Jobs Option (Y/N)": "Federal Two Jobs Option (Y/N)",
+    "W4 Extra Withholding Amount": "W4 Extra Withholding Amount",
+    "W4 Deductions Amount": "W4 Deductions Amount",
+    "W4 Other Income Amount": "W4 Other Income Amount",
+    "W4 Qualifying Dependents Amount": "W4 Qualifying Dependents Amount",
+    "W4 Other Dependents Amount": "W4 Other Dependents Amount",
+    "W4 Total Dependents Amount": "W4 Total Dependents Amount",
+    "W4 Exempt Status Text": "W4 Exempt Status Text",
+    "W4 Non-Resident Alien Text": "W4 Non-Resident Alien Text",
+    
+    "W4Config_company_name~7": "W4 Company Name",
+    "W4Config_company_name~8": "W4 Company Name",
+    "W4Config_company_name~9": "W4 Company Name",
+    "W4Config_company_name~10": "W4 Company Name",
+    
+    "ConfigW4_ein_tax_id~7": "EIN/Tax ID",
+    "W4Config_ein_tax_id~8": "EIN/Tax ID",
+    "ConfigW4_ein_tax_id~10": "EIN/Tax ID",
+    
+    "W4Config_Transforms_addr__full_s1_s2_c_st_zip_vc~7": "W4 Company Address",
+    "W4ConfigTran_addr_full_s1_s2_c_st_zip_VC~8": "W4 Company Address",
+    "W4Config_Transforms_addr__full_s1_s2_c_st_zip_vc~10": "W4 Company Address",
+    
+    "W4ConfigTran_addr__street_full_VC~9": "W4 Company Street",
+    "W4Config_addr__city~9": "W4 Company City",
+    "W4Config_addr__state_desc~9": "W4 Company State",
+    "W4Config_addr__zip_code~9": "W4 Company Zip",
+
+    "Employee_W4_TwoJobs_line_1_amnt~7": "W4 Two Jobs Line 1 Amount",
+    "Employee_W4_ThreeJobs_line_2a_amnt~7": "W4 Three Jobs Line 2a Amount",
+    "Employee_W4_ThreeJobs_line_2b_amnt~7": "W4 Three Jobs Line 2b Amount",
+    "Employee_W4_ThreeJobs_line_2c_amnt~7": "W4 Three Jobs Line 2c Amount",
+    "Employee_W4_MultiJobs_line_4_amnt~7": "W4 Multi Jobs Line 4 Amount",
+    "Employee_W4_MultiJobs_line_3_txt~7": "W4 Multi Jobs Line 3 Text",
+    "Employee_W4_Deductions_wh_line_1_amnt~7": "W4 Deductions Line 1 Amount",
+    "Employee_W4_Deductions_wh_line_2_amnt~7": "W4 Deductions Line 2 Amount",
+    "Employee_W4_Deductions_wh_line_3_amnt~7": "W4 Deductions Line 3 Amount",
+    "Employee_W4_Deductions_wh_line_4_amnt~7": "W4 Deductions Line 4 Amount",
+    "Employee_W4_Deductions_wh_line_5_amnt~7": "W4 Deductions Line 5 Amount",
+
+    # === NEW YORK STATE TAX WITHHOLDINGS (IT-2104) ===
+    "NewYorkIT2104_marital_status_W4_rdo~8": "NY Marital Status",
+    "NewYorkIT2104_wh_resident_yn~8": "NY Resident (Y/N)",
+    "NewYorkIT2104_wh_resident_yn~9": "NY Resident (Y/N)",
+    "NewYorkIT2104_z_wh4_newyork_yonkers_yn~8": "NY Yonkers Resident (Y/N)",
+    "NewYorkIT2104_z_wh4_newyork_yonkers_yn~9": "NY Yonkers Resident (Y/N)",
+    "W4_STATE~8": "Withholding State",
+    
+    "NewYorkIT2104_wh_line_1_amnt~8": "NY Allowances Line 1",
+    "NewYorkIT2104_wh_line_3_amnt~8": "NY Allowances Line 3",
+    "NewYorkIT2104_wh_line_4_amnt~8": "NY Allowances Line 4",
+    "NewYorkIT2104_wh_line_5_amnt~8": "NY Allowances Line 5",
+    "NewYorkIT2104_wh_line_15_amnt~8": "NY Allowances Line 15",
+    "NewYorkIT2104_wh_line_16_amnt~8": "NY Allowances Line 16",
+    "NewYorkIT2104_wh_line_19_amnt~8": "NY Allowances Line 19",
+    "NewYorkIT2104_wh_line_21_amnt~8": "NY Allowances Line 21",
+    "NewYorkIT2104_wh_line_22_amnt~8": "NY Allowances Line 22",
+    "NewYorkIT2104_wh_line_23_amnt~8": "NY Allowances Line 23",
+    "NewYorkIT2104_wh_line_26_amnt~8": "NY Allowances Line 26",
+    "NewYorkIT2104_wh_line_27_amnt~8": "NY Allowances Line 27",
+    "NewYorkIT2104_wh_line_28_amnt~8": "NY Allowances Line 28",
+    "P_W4_NY_wh_line_16_total~8": "NY Allowances Total Line 16",
+    
+    "NewYorkIT2104_wh_line_1_txt~8": "NY Withholding Text Line 1",
+    "NewYorkIT2104_wh_line_2_txt~8": "NY Withholding Text Line 2",
+    "NewYorkIT2104_wh_line_6_txt~8": "NY Withholding Text Line 6",
+    "NewYorkIT2104_wh_line_7_txt~8": "NY Withholding Text Line 7",
+    "NewYorkIT2104_wh_line_8_txt~8": "NY Withholding Text Line 8",
+    "NewYorkIT2104_wh_line_9_txt~8": "NY Withholding Text Line 9",
+    "NewYorkIT2104_wh_line_10_txt~8": "NY Withholding Text Line 10",
+    "NewYorkIT2104_wh_line_11_txt~8": "NY Withholding Text Line 11",
+    "NewYorkIT2104_wh_line_12_txt~8": "NY Withholding Text Line 12",
+    "NewYorkIT2104_wh_line_13_txt~8": "NY Withholding Text Line 13",
+    "NewYorkIT2104_wh_line_14_txt~8": "NY Withholding Text Line 14",
+    "NewYorkIT2104_wh_line_17_txt~8": "NY Withholding Text Line 17",
+    "NewYorkIT2104_wh_line_25_txt~8": "NY Withholding Text Line 25",
+    "NewYorkIT2104_wh_line_34_txt~8": "NY Withholding Text Line 34",
+    "P_W4_NY_wh_line_6_txt~8": "NY Withholding Text Line 6 (P_W4)",
+    "P_W4_NY_wh_line_30_txt~8": "NY Withholding Text Line 30 (P_W4)",
+    
+    "NewYorkIT2104~9": "NY IT-2104 Page 9 Status",
+    "NewYorkIT2104~9.1_nonresident_yn": "NY Non-Resident Status (Y/N)",
+    "NewYorkIT2104~9.1_NTS_percent_txt": "NY Non-Resident NYS Work Percent",
+    "NewYorkIT2104~9.1_Yonkers_percent_txt": "NY Non-Resident Yonkers Work Percent",
+    "percent_estimate_NYS_yn~9": "Estimate NYS Tax (Y/N)",
+    "percent_estimate_Yonkers_yn~9": "Estimate Yonkers Tax (Y/N)",
+    "StateWithholding_wh_exemption_excesive_chk~8": "Excessive Withholding Exemption (Y/N)",
+    "State Withholding_NEW_HIRE_YN~8": "New Hire (Y/N)",
+
+    # === NY SPECIAL HR LABELS (WT-240) ===
+    "ConfigNYEmp_dba_name~10": "Employer DBA Name",
+    "Company_phone_work~10": "Employer Work Phone",
+    "HR_ny_notice_given~10": "NY Notice Given Format",
+    "HR_ny_pay_rate~10": "NY Pay Rate Amount",
+    "HR_ny_allowances_none_yn~10": "NY Allowances None (Y/N)",
+    "HR_ny_allowances_tips_yn~10": "NY Allowances Tips (Y/N)",
+    "HR_ny_allowances_meals_yn~10": "NY Allowances Meals (Y/N)",
+    "HR_ny_allowances_lodging_yn~10": "NY Allowances Lodging (Y/N)",
+    "HR_ny_allowances_other_yn~10": "NY Allowances Other (Y/N)",
+    "HR_ny_allowances_tips_amount~10": "NY Allowances Tips Amount",
+    "HR_ny_allowances_meals_amount~10": "NY Allowances Meals Amount",
+    "HR_ny_allowances_lodging_amount~10": "NY Allowances Lodging Amount",
+    "HR_ny_allowances_other_txt~10": "NY Allowances Other Description",
+    "HR_ny_regular_payday~10": "NY Regular Payday Schedule",
+    "HR_ny_pay_frequency~10": "NY Pay Frequency",
+    "HR_ny_ot_payrate~10": "NY Overtime Pay Rate",
+
+    # === FORMS DESIGNATORS & CUSTOM HR QUESTIONS ===
+    "DNM_Form_Type_Designator__B~8": "Form Designator B",
+    "DNM_Form_Type_Designator__B_2~8": "Form Designator B 2",
+    "EF_HR_location_custom_questions_txt_1~3": "Location Custom Question 1 (Pg 3)",
+    "EF_HR_custom_questions_txt_1~4": "Custom Question 1 (Pg 4)",
+    "EF_HR_custom_questions_txt_2~4": "Custom Question 2 (Pg 4)",
+    "EF_HR_location_custom_questions_txt_4~4": "Location Custom Question 4 (Pg 4)",
+
+    # === SIGNATURES & AUTHORIZATIONS ===
+    "employee_authorization_signature~3": "Employee Signature (Pg 3)",
+    "employee_authorization_signature~4": "Employee Signature (Pg 4)",
+    "employee_authorization_signature~7": "Employee Signature (Pg 7)",
+    "employee_authorization_signature~8": "Employee Signature (Pg 8)",
+    "employee_authorization_signature~9": "Employee Signature (Pg 9)",
+    "employee_authorization_signature~10": "Employee Signature (Pg 10)",
+    "rep_click_signature~3": "Representative Signature (Pg 3)",
+    "rep_click_signature~4": "Representative Signature (Pg 4)",
+    "rep_click_name~10": "Authorized Representative Name",
+    "rep_click_title~10": "Authorized Representative Title",
 }
 
-# The final column structure and order you want in your final Excel report
+# Clean, structured column presentation order for the final spreadsheet output
 FINAL_COLUMNS = [
     "First name", 
     "Last name", 
@@ -143,13 +217,13 @@ if submit_button:
                         if value.startswith("/"):
                             value = value.lstrip("/")
                     
-                    # Convert raw PDF key to final standardized Excel column name
+                    # Convert raw PDF key to standardized Excel column name
                     clean_column_name = FIELD_MAP.get(field_name, field_name)
                     
-                    # Prevent empty values on multi-page packets from erasing filled ones
+                    # Overwrite protection logic to prevent blanks on subsequent pages from erasing filled ones
                     if value:
                         if clean_column_name in file_data and file_data[clean_column_name]:
-                            # Keep whichever string is longer (more complete)
+                            # Keep whichever string value is longer/more complete
                             if len(str(value)) > len(str(file_data[clean_column_name])):
                                 file_data[clean_column_name] = value
                         else:
@@ -166,15 +240,14 @@ if submit_button:
             progress_bar.progress((index + 1) / len(uploaded_files))
 
         if all_form_data:
-            # === AUTO-SAVE JSON TO GOOGLE COLAB FILE SYSTEM ===
-            # This writes the physical JSON file directly into your Colab sidebar
+            # === AUTO-SAVE JSON TO COLAB FILE SYSTEM ===
             try:
                 with open("extracted_data.json", "w", encoding="utf-8") as f:
                     json.dump(all_form_data, f, indent=4)
-            except Exception as json_err:
-                pass  # Fallback protection if operating outside a write-accessible environment
+            except Exception:
+                pass
 
-            # Create the data frame and align directly to final clean headers
+            # Align DataFrame directly to our friendly column layout
             df = pd.DataFrame.from_dict(all_form_data, orient="index")
             df = df.reindex(columns=FINAL_COLUMNS)
             df.index.name = "Source File Name"
@@ -187,14 +260,14 @@ if submit_button:
             st.write("Review the extracted data below before downloading:")
             st.data_editor(df, use_container_width=True, key="excel_preview", disabled=True)
             
-            # Prepare the Excel file in the background
+            # Save Excel workbook file to memory buffer
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
                 df.to_excel(writer, index=True, sheet_name='Extracted Data')
             
             st.markdown("---")
             
-            # Place the Excel and JSON download buttons side by side
+            # UI Downloads Columns
             col1, col2 = st.columns(2)
             with col1:
                 st.download_button(
