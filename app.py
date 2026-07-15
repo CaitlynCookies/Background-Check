@@ -32,6 +32,7 @@ FIELD_MAP = {
     
     # --- DOB ---
     "DOB": "DOB",
+    "EF_Emp_birth_date~3": "DOB",
     "EF_Emp_birth_date~4": "DOB",
     "EF_Emp_birth_date~5": "DOB", # New Form variant
     "EF_Emp_birth_date~7": "DOB",
@@ -79,6 +80,7 @@ FIELD_MAP = {
     
     # --- EMAIL ADDRESS ---
     "Email Address": "Email Address",
+    "EF_Emp_email~3": "Email Address",
     "EF_Emp_email~4": "Email Address",
     "EF_Emp_email~5": "Email Address", # New Form variant
     "EF_Emp_email~7": "Email Address",
