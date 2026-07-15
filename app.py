@@ -10,6 +10,7 @@ import logging
 
 # 1. Simplified Field Map (No ~7, ~8, ~10 page suffixes needed anymore!)
 FIELD_MAP = {
+    # === PERSONAL INFORMATION ===
     "personal_name_first": "First Name",
     "ef_emp_name_first": "First Name",
     "personal_name_last": "Last Name",
@@ -22,9 +23,31 @@ FIELD_MAP = {
     "personaltran_name__full_f_s_m_s_l_vc": "Full Name",
     "personal_ssn": "SSN",
     "ef_emp_ssn": "SSN",
+    
+    # --- CRITICAL FIX: DATE OF BIRTH VARIANTS ---
     "ef_emp_birth_date": "Date of Birth",
+    "personal_birth_date": "Date of Birth",
+    "dob": "Date of Birth",
+    "birth_date": "Date of Birth",
+    "employee_dob": "Date of Birth",
+    
+    # --- CRITICAL FIX: PRIMARY PHONE VARIANTS ---
     "ef_emp_phone_primary": "Primary Phone",
+    "personal_phone_primary": "Primary Phone",
+    "phone_primary": "Primary Phone",
+    "phone": "Primary Phone",
+    "cell_phone": "Primary Phone",
+    "telephone": "Primary Phone",
+    "employee_phone": "Primary Phone",
+    
+    # --- CRITICAL FIX: EMAIL VARIANTS ---
     "ef_emp_email": "Email Address",
+    "personal_email": "Email Address",
+    "email": "Email Address",
+    "email_address": "Email Address",
+    "employee_email": "Email Address",
+    
+    # === CONTACT & ADDRESS ===
     "resaddrtran_addr__street_full_vc": "Street Address",
     "resaddr_addr__street_1": "Street Address 1",
     "ef_emp_residence_street_1": "Street Address 1",
