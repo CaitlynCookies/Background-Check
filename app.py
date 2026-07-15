@@ -27,8 +27,8 @@ def extract_visual_fallbacks(reader):
     if email_match:
         fallback_data["Email Address"] = email_match.group(0)
         
-    # Regex search for Phone Number (captures formats like: (123) 456-7890, 123-456-7890, 123.456.7890)
-    phone_match = re.search(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', full_text)
+    # Regex search for Phone Number (Requires separators like dashes, dots, or parentheses)
+    phone_match = re.search(r'\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}', full_text)
     if phone_match:
         fallback_data["Phone"] = phone_match.group(0)
         
@@ -184,15 +184,14 @@ if submit_button:
                             file_data[clean_column_name] = ""
                             
                 # ==========================================
-                # 5. THE FALLBACK TRIGGER (PLACED HERE)
+                # 5. THE SAFE FALLBACK TRIGGER (REVISED)
                 # ==========================================
-                # Standard mapping finished. Now, are crucial fields still blank?
+                # Only fallback if the fields are completely missing from the PDF's form data
                 missing_crucial_fields = [
                     f for f in ["DOB", "Phone", "Email Address"] 
                     if not file_data.get(f) or file_data.get(f) == ""
                 ]
                 
-                # If they are, parse the visual text layer of the PDF using regex
                 if missing_crucial_fields:
                     fallback_values = extract_visual_fallbacks(reader)
                     
