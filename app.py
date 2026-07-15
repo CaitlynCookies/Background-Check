@@ -7,8 +7,6 @@ import re
 import difflib
 import logging
 
-# Silence the harmless Streamlit thread context warning in your console
-logging.getLogger("streamlit.runtime.scriptrunner_utils").setLevel(logging.ERROR)
 
 # 1. Simplified Field Map (No ~7, ~8, ~10 page suffixes needed anymore!)
 FIELD_MAP = {
@@ -49,7 +47,6 @@ DESIRED_COLUMNS = [
     "Primary Phone", 
     "Date of Birth", 
     "Street Address 1", 
-    "Street Address 2",
     "City", 
     "State", 
     "Zip Code", 
