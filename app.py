@@ -42,8 +42,6 @@ FIELD_MAP = {
 DESIRED_COLUMNS = [
     "First Name", 
     "Last Name", 
-    "Middle Initial",
-    "Full Name",
     "Primary Phone", 
     "Date of Birth", 
     "Street Address 1", 
