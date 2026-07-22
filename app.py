@@ -48,6 +48,26 @@ def extract_visual_fallbacks(reader):
             
     return fallback_data
 
+def parse_city_state_zip(csz_string):
+    """
+    Parses strings like 'Houston, TX 77002' or 'Dallas TX 75201' 
+    into separate City, State, and Zip values.
+    """
+    if not csz_string:
+        return "", "", ""
+        
+    # Pattern looks for: City (optional comma) State (2 letters) Zip (5 or 9 digits)
+    pattern = r'^(.*?)[,\s]+([A-Za-z]{2})\s+(\d{5}(?:-\d{4})?)$'
+    match = re.search(pattern, csz_string.strip())
+    
+    if match:
+        city = match.group(1).strip()
+        state = match.group(2).strip().upper()
+        zip_code = match.group(3).strip()
+        return city, state, zip_code
+    
+    return "", "", ""
+
 
 # ==========================================
 # 2. FIELD MAPPING & FINAL COLUMNS
@@ -71,6 +91,9 @@ BASE_FIELD_MAP = {
     # --- DOB ---
     "DOB": "DOB",
     "EF_Emp_birth_date": "DOB",
+
+    # --- COMBINED CITY, STATE, ZIP (Texas Forms) ---
+    "ResAddrTran_addr__city_cs_state_s_zip_VC": "Full Address CSZ",
     
     # --- ADDRESS STREET ---
     "Address Street": "Address Street",
@@ -182,6 +205,18 @@ if submit_button:
                     else:
                         if clean_column_name not in file_data:
                             file_data[clean_column_name] = ""
+
+                # --- TEXAS CITY/STATE/ZIP SPLITTER ---
+                if file_data.get("Full Address CSZ"):
+                    combined_csz = file_data.get("Full Address CSZ")
+                    city, state, zip_code = parse_city_state_zip(combined_csz)
+                    
+                    if city and not file_data.get("Address City"):
+                        file_data["Address City"] = city
+                    if state and not file_data.get("Address State"):
+                        file_data["Address State"] = state
+                    if zip_code and not file_data.get("Address Zip"):
+                        file_data["Address Zip"] = zip_code
                             
                 # ==========================================
                 # 5. THE SAFE FALLBACK TRIGGER (REVISED)
